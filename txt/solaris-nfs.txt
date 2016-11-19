@@ -1,0 +1,51 @@
+==================
+NFS
+==================
+Mount Points & Filesysetms
+--------------------------------
+Note: UFS doesn’t support RAIDs.  Use ZFS or Metadisk.
+/etc/dfstab – NFS mount point configuration file
+
+List file systems that are currently mounted: /etc/mnttab
+
+Troubleshooting Mount Points
+----------------------------------
+Symptoms:
+  - "df" hangs
+  - Can't chdir to a known mounted directory
+  - Recieve "permission denied" to a known accessible mounted directory
+1. Is the automountd daemon up?
+   ps -ef | grep automounted
+2. Restart automountd if down:
+   SOLARIS 9/10: stopsrc -s automountd; startsrc -s automountd
+NFS Note: You may have to unshare via "exportfs -u <nfs_name>:<mount_path>"
+before attempting a remount or unmount.
+EXPORTFS: Maintain a table of "exported" NFS file systems.
+
+Display all remote mounts: % showmount –e
+Display remotely mounted directories: % showmount -d
+
+Fix “stale” file handles on NFS Clients (Solaris 9)
+--------------------------------------------------------
+Bounce the NFS client daemon on each NFS client:
+% /etc/rc2.d/S73nfs.client stop
+% /etc/rc2.d/S73nfs.client start
+Note: Solaris 10 – Can’t host NFS in a Non-Global zone.
+
+Restart Solaris NFS Daemon
+---------------------------------
+Solaris 9: /etc/init.d/nfs/server
+Solaris 10: svc:network/nfs/server
+
+Display rpcbind statistics on a given host: % rpcinfo –m <hostname>
+
+Restart AIX NFS Daemon
+-----------------------------
+1. See if the NFS process is running
+% lssrc –a | grep nfs
+2. Stop the nfsd process
+% stopsrc –s nfs
+3. Start the nfsd process
+% startsrc –s nfs
+4. Verify the mount points
+% df –k

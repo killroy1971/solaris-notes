@@ -1,0 +1,29 @@
+=======================
+Solaris - Service Management
+=======================
+Monitor Daemon Services - svcs
+-------------------------------------
+- svcs #: List all installed services with status
+- svcs -a #: Same as above, but include disabled services
+- svcs -l <service> #: Show <service> status
+
+Manage Services - svcadm
+-------------------------------
+* svcadm options
+% svcadm restart <service>
+% svcadm disable <service> #: -s Wait till service is disabled; -t Temporarily disable service
+% svcadm enable <service> #: -r Include dependencies; -s Wait till service is online or degraded; -t Temporarily enable service
+% svcadm refresh <service> #: Re-load configuration file
+
+svcadm – start/stop/reload/disable/enable system services 
+--------------------------------------------------------------------
+(daemons)
+States: enable, disable, restart, refresh, mark (for maintenance), clear (maintenance), milestone (advance to a service “milestone”).
+
+===========
+Live Update
+===========
+To change root environments:
+lustatus: list kernels and show which is active, or confirm which kernel will load at boot
+luactivate <kernel_name>: Set <kernel_name> active at next reboot
+Activate new kernel: shutdown -g0 -i6 restart

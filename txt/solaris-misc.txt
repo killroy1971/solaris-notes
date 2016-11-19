@@ -1,0 +1,74 @@
+====
+Misc
+====
+
+Stop and Start SYSLOG (Solaris 9)
+----------------------------------------
+# /etc/init.d/syslog stop; /etc/init.d/syslog start
+
+Cycle RPC (Solaris 9 and 10)
+---------------------------------
+# /etc/init.d/rpc stop; /etc/init.d/rpc start
+
+Find System Timezone: /etc/default/timezone
+
+UTMPX: Track the login state of each user
+-------------------------------------------------
+/var/adm/utmp (a binary file) – the database with this information.
+
+Find bad inodes: /var 
+
+Make a “whatis” (catalog for man pages) database 
+-----------------------------------------------------------
+/usr/lib/makewhatis
+This command will read /etc/man.config and  use the MANPATHs specified.
+
+Identify users logged into a machine: % who
+----------------------------------------------------
+“who” options:
+-b – include time/date of last reboot
+-d – display all expired and un-respawned processes
+-I – list only line on which the system is waitin for someone to login
+-p – list any active and init spawned processes
+-r – indicate current init process run level
+-s – default.  List name, line and time.
+
+List Kill Signals
+-----------------
+kill -l  -OR-  man -s3head signal
+
+WTMPX – this records all
+------------------------------
+- login & logout history
+- system reboots
+
+
+WTMPX - contains user access and accounting history information
+----------------------------------------------------------------------------
+LAST – reads the binary file /var/adm/wtmpx
+Clear wtmpx: # cat /dev/null > /var/adm/wtmpx
+List failed login attempts: lastb
+
+Swap Commands
+---------------------
+Show current setup: swap -l
+Activate swap partition: swap -a <path>
+Deactivate swap partition: swap -d <path>
+Note: On solaris, you can have multiple partitions act as swap.  Be sure to add to /etc/vfstab
+
+==========
+Core dumps
+==========
+Note: Cores to in: /var/cores
+Show current config: cored
+Set Global file name pattern: coreadm -g /var/cores/%f.%n.%p.%t.core 
+Set default per-process file name pattern: coreadm -i /var/cores/%f.%n.%p.%t.core 
+  %f — file name; %n — node; %p — pid; %t — date/time stamp (probably best to leave this as-is)
+  Set options to enable: -e <option> <option>
+  Set options to disable: -d <option> <option>
+  Options:
+  global, global-setid, log, proc-setid
+
+Limit core size
+-----------------
+ulimit -c <size-or-unlimited>

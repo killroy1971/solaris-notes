@@ -1,0 +1,17 @@
+=================
+Rename Solaris Server
+=================
+
+Edit the following flies:
+/etc/hosts
+/etc/nodname
+
+List all network interfaces: ifconfig –a4 and ifconfig –a6
+Use ifconfig <interface> unplumb for any interfaces that you no longer wish to use.
+Edit /etc/hostname.<interface-you-plan-on-using> to change the server's IP address.
+Remove any /etc/hostsname.<interaface> files for unplumbed interfaces.
+Edit /etc/netmasks – Change the netmask to the new subnet’s netmask.
+Edit /etc/defaultrouter – Change to the new default gateway
+Edit /etc/vfstab – Remove any nfs mounts that are no longer valid
+
+Reboot and check configuration

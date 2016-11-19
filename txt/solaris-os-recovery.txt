@@ -1,0 +1,74 @@
+=====================
+Single User Mode Boot
+=====================
+Boot from CD-ROM to Single User Mode - SPARC
+----------------------------------------------------------
+1. Press <ESC>-<SHIFT>-<B> after the memory check to get to the command line
+2. Boot from CD-ROM to Single User Mode: boot cdrom -s
+3. Make directory to mount the disk.  Note: cdrom mounts to /tmp/root: cd /tmp/root; mkdir test
+4. Mount cdrom to a disk: mount /dev/dsk/c1t2d0s0 /tmp/root/test
+5. Change shell and set terminal variable: /bin/bash; export TERM=vt100
+
+Boot from CD-ROM to Single User Mode - X86
+------------------------------------------------------
+1. Insert boot DVD into DVD drive (or an external DVD drive)
+2. Reboot, and press F2 at the first visible BIOS screen
+3. In the BIOS change the first boot drive to your chosen DVD drive.  Then save settings and reboot again.
+4. At the Grub screen, choose the “Solaris” entry if you’re using an attached K-V-M,
+    or option 2 if you’re using a serial console.
+    5. Sync the filesystems when prompted
+    6. Choose the local partition you wish to repair
+    7. Set your shell variables: export TERM=vt100; export EDITOR=vi; stty erase <BKSP>
+    8. When complete, I recommend leaving the BIOS in this configuration for future break/fix operations.
+
+
+
+ZFS  Single User Mode -- Working file system
+----------------------------------------------------
+Press <ESC>-<SHIFT>-<B> after the memory check to get to the command line
+ - SPARC: boot -F failsafe
+ - x86: Select <failsafe> from the GRUB prompt
+Mount ZFS BE on /a when prompted.  You will see:
+ .
+ .
+ .
+ ROOT /zfsBE was found on rpool
+ Do you wish to have it mounted read-write on /a? [y,n,?]
+
+Change to /a/etc/ directory: cd /a/etc
+Configure environments: TERM=vt100; export TERM
+Edit passwd or shadow file
+Reboot: init 6
+
+ZFS  Single User Mode -- Not working file system
+--------------------------------------------------------
+Press <ESC>-<SHIFT>-<B> after the memory check to get to the command line
+ - SPARC: boot cdrom -s
+ - x86: Select <boot> from the local CD option
+Mount rpool: zpool import -R /a rpool
+Mount ZFS BE: zfs mount rpool/ROOT/zfsBE
+Change to /a directory: cd /a
+Configure environments: TERM=vt100; export TERM
+Perform file system clean up or ZFS recovery steps
+Reboot: init 6
+
+Solaris Disk Partitions
+-------------------------
+Disk partitions are in /dev/dsk/ and are numbered: c?t?d?s?
+List partitions: Run the format command;  Then select a disk, 0 thru ?;  Enter "p" or "partition"; Type "p" or "print" to display slice information; "q" to quit
+- The "tag" will tell you which partitions correspond to /etc/vfstab entries.  i.e. "root" is the root partition.  "unassigned" means unused.
+Check for ZFS root pool (zpool): zpool list
+Mount non-ZFS disk partitions: mount -o <ro or rw> /dev/dsk/<partition> /<mount point>
+Mount ZFS root partition: zpool import -f rpool 
+
+Solaris Single User Mode for expired root password
+-----------------------------------------------------------
+Run the "Boot from CD-ROM to Single User Mode" procedure
+Identify the root partition: i.e. c0t3d0s0
+Mount root to /a as read/write: mount -o rw /dev/dsk/c0t3d0s0 /a
+Configure environment: cd /a/etc/; TERM=vt100; export TERM
+Replace root's password entry with a working password hash
+cd /
+umount /a
+Reboot: init 6
+

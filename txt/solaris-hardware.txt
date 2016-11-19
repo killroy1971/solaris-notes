@@ -1,0 +1,363 @@
+==================
+SOLARIS HARDWARE
+==================
+cfgadm: List all device names on a system
+devfsadm: manages /dev and path-to-inst database
+prtenv: Display EEPROM parameters
+bootblk: Tells system where to boot from
+btmp:    Keeps track of failed logon attempts 
+
+Check PROM Boot Device
+eeprom | grep boot-device
+
+SET AUTO_BOOT TO FALSE
+--------------------------------
+eeprom auto-boot\?=false OR eeprom "auto-boot?"=false
+SET AUTO_BOOT TO TRUE
+-------------------------------
+eeprom auto-boot\?=true
+
+Obtain configuration data
+fbconfig -prconf        Display fb hardware configuration
+fbconfig -propt        Dispaly fb software configuration
+fbconfig -list        List configurable devices
+
+SYS_CONTROL – System controller commands
+- poweron
+- showboards
+- showchs –v –c <controller>
+Show All Domains: showplatforms
+Set Keyswitch to Standby: keyswitch -<domain> standby
+Set Keyswitch to Off: keyswitch -<domain> off
+
+Display License Information: flexlm
+Licenses are managed from /etc/opt/licenses
+
+Display Information (framebuffer)
+Sun XVR-1200: /dev/fbs/jfb0
+Sun XVR-600: /dev/fbs/jfb0
+Sun XVR-300: /dev/fbs/nfb
+
+IOSTAT: reports terminal and disk I/O activity and CPU utilization.
+Display all device error statistics: iostat -E
+Display device name in descripted format: iostat -n <device_name>
+
+DISPLAYING DIMM INFORMATION:
+ 
+-> show /SYS/MB/CMP0/BR0/CH0/D#
+ 
+    Targets:
+        SEEPROM
+        SERVICE
+        PRSNT
+        T_AMB
+ 
+    Properties:
+        type = DIMM
+        component_state = Enabled
+        fru_name = 4096MB DDR2 SDRAM FB-DIMM 333 (PC2 2600)
+        fru_description = FBDIMM 4096 Mbyte
+        fru_manufacturer = Samsung
+        fru_version = FFFFFF
+        fru_part_number = 501-7954-01 Rev 05
+        fru_serial_number = 00CE01074627037EA3
+        fault_state = OK
+        clear_fault_action = (none)
+ 
+Setting up Network Managment Port ILOM:
+ 
+-> set pendingipaddress=<ip_address>
+-> set pendingipdiscovery=static
+-> set pendingipnetmask=255.255.255.0
+-> set pendingipgateway=<ip_address>
+-> set commitpending=true
+ 
+Setting up Network Managment Port ALOM:
+ 
+sc> setsc if_network true
+sc> setsc if_connection "telnet or ssh"
+sc> setsc netsc_dhcp false
+sc> setsc netsc_ipaddr <ip_address>
+sc> setsc netsc_ipnetmask <netmask>
+sc> setsc netsc_ipgateway <ip_address>
+sc> setsc netsc_commit
+Procedure to set the Serial Number after PDB replacement
+--------------------------------------------------------
+sc> setsc sc_servicemode true
+Warning: misuse of this mode may invalidate your warranty.
+sc> setcsn -c chassis_serial_number
+Are you sure you want to permanently set the Chassis Serial Number
+to chassis_serial_number[y/n]? y
+Chassis serial number recorded.
+sc> showplatform
+SUNW,Sun-Fire-T5120
+Chassis Serial Number: chassis-serial-number
+Domain Status
+------ ------
+S0 Running
+sc>setsc sc_servicemode false 
+
+****************************************************
+Solaris ILOM / ALOM Commands
+****************************************************
+ILOM - Integrated Lights Out Management for:
+SunFire X4100(M2)/X4200(M2)/X4600(M2)/X4140/X4240/X4440/X4150/X4250/X4450/X4170/X4270/X2250/X2270
+Sun Blade 6000 Chassis Management Module/Blade Module(X6220/X6420/X6240/X6440/X6250/X6450/X6270/X6275)
+Sun CMT servers/blades (Sun T5120, T5220, T5240, T6340, T6320)
+
+ALOM - Advanced Lights Out Management for: SunFire V125/V210/V215/V240/V245/V250/V440/T1000, Sun Netra 210/240/440
+
+ILOM ALOM CMT Command Comparison
+
+ALOM:           ILOM:
+setdate         set /SP/clock datetime=value
+                    value format: MMDDhhmmYYYY
+ 
+setdefaults     set /SP reset_to_defaults=all
+                    -> reset /SP This resets the SP
+ 
+setkeyswitch    set /SYS keyswitch_state=value
+                    value= normal, diag, stby, locked
+ 
+setsc           set target property=value
+setupsc         No equivalent in ILOM
+setlocator      set /SYS/LOCATE value= Fast_Blink or off
+setfru -c data  set /SYS customer_frudata=data 
+showplatform    show /HOST
+showplatform    show /SYS ( to view Serial Number )
+showfru         No equivalent in ILOM
+showusers -g #  show /SP/users
+showhost        show /HOST
+showkeyswitch   show /SYS keyswitch_state
+ 
+showsc param    show target property
+VIEW DIAG LEVEL show /HOST/diag
+ 
+setsc diag_level set /HOST/diag trigger=All-resets
+                     none, normal, User-reset, Power-on-reset, Error-reset
+ 
+showdate        show /SP/clock datetime
+ 
+showlogs        show /SP/logs/event/list
+showlogs        show /SP/faultmgmt
+                set /SP/logs/event clear=true
+ 
+showenvironment show -o table -level all /SYS
+shownetwork     show /SP/network
+showlocator     show /SYS/LOCATE
+password        set /SP/users/<username> password
+restartssh      set /SP/services/ssh restart_sshd_action=true
+usershow        show /SP/users
+useradd user    create /SP/users/<username>
+ 
+Create "admin"  create /SP/users/admin
+                set /SP/users/admin role=Administrator
+                set /SP/users/admin cli_mode=alom
+ 
+userdel user    delete /SP/users/<username>
+userdel -y      delete -script /SP/users/<username>
+userpassword    set /SP/users/<username> password
+userperm user   set /SP/users/<username> role=permissions
+consolehistory  SEE RENE FOR MORE INFO ;)
+console -f      start -force /SP/console
+break -c        set /HOST send_break_action=break
+break -D        set /HOST send_break_action=dumpcore
+ 
+bootmode        set /HOST/bootmode property=value
+                    state=value "reset_nvram or normal"
+                    script="setenv auto-boot? false"
+ 
+flashupdate -s  load -source tftp://ipaddr/pathname
+reset -c        reset /SYS
+reset -y -c     reset -script /SYS
+powercycle      stop /SYS
+powercycle -y   stop -script /SYS
+powercycle -f   stop -force /SYS
+                start -force /SYS
+poweroff        stop /SYS
+poweroff -y     stop -script /SYS
+poweroff -f     stop -force /SYS
+poweron         start /SYS
+clearfault uuid set /SYS/component clear_fault_action=true
+removefru -y    set /SYS/PS0 prepare_to_remove_action=true
+enablecomponent set /SYS/component component_state=enabled
+disablecomp     set /SYS/component component_state=disabled
+clearasrdb      No equivalent in ILOM
+resetsc         reset /SP
+resetsc -y      reset -script /SP
+userclimode     set /SP/users/<username> cli_mode=default or alom
+logout          exit
+
+ALOM CMT Variable Comparison
+ 
+ALOM:           ILOM:
+diag_level      /HOST/diag level
+diag_mode       /HOST/diag mode
+diag_trigger    /HOST/diag trigger
+diag_verbosity  /HOST/diag verbosity
+if_connection   /SP/services/ssh state
+if_emailalerts  /SP/clients/smtp state
+if_network      /SP/network state
+if_snmp         /SP/services/snmp
+mgt_mailalert   /SP/alertmgmt/rules
+mgt_mailhost    /SP/clients/smtp address
+mgt_snmptraps   /SP/sevices/snmp v1|v2c|v3
+mgt_traphost    /SP/alertmgmt/rules
+                /SP/services/snmp port
+netsc_dhcp      /SP/network pendingipdiscovery
+netsc_commit    /SP/network commitpending=true
+netsc_enetaddr  /SP/network macaddress
+netsc_ipaddr    /SP/network pendingipaddress
+netsc_ipgateway /SP/network pendingipgateway
+netsc_ipnetmask /SP/network pendingipnetmask
+sc_backupuserdata       /SP BACKUP_USER_DATA
+sc_customerinfo /SP system_identifier
+sc_escapechars  /SP/console escapechars
+sc_powerondelay /SP/policy HOST_POWER_ON_DELAY
+ 
+sc_powerstatememory     /SP/policy HOST_LAST_POWER_STATE
+                        States= enabled or disabled
+ 
+ser_baudrate    /SP/serial/external pendingspeed
+ser_data        No equivalent in ILOM
+ser_parity      /SP/serial/external pendingparity
+ser_stopbits    /SP/serial/external pendingstopbits
+sys_autorestart /SP autorestart
+sys_autorunonerror      /SP autorunonerror
+sys_eventlevel  No equivalent in ILOM
+sys_enetaddr    /HOST macaddress
+
+HOW TO RESET ILOM PASSWORD
+-------------------------
+InfoDoc #: 209731
+ 
+Power down the host system (using the front panel powerbutton)
+or if an SP admin account exists, you can alternatiely use that
+accounts ALOM Command Line Interface poweroff command.
+ 
+Unplug the system's power cord(s) Remove the system's top cover.
+ 
+ Insert a Jumper (you provide the jumper) on Pins 1 & 2 of PJ6801.
+ This Jumper is located at the T5120/T5220 Motherboard
+ 
+ Insert a Jumper (you provide the jumper) on Pins 1 & 2 of J10401
+ This Jumper is located on the SP of the T5140/T5240
+ 
+- near the edge of the Motherboard at rear of the system -
+  center of the rear edge of the Motherboard.
+ 
+Plug in the system's power cord(s).
+ 
+Press the front panel Power button to power on the system.
+  You must power on the system to complete the reset.
+ 
+This is because the state of the PJ6801 jumper cannot be
+determined without the host CPU running.
+ 
+The SP root password will be reset to the default  changeme.
+ 
+Log in as root into the SP, using any available method - ssh
+or a Web Browser to the SP's network management port or via
+tip-hardware or a terminal server to the SP's serial management
+port.
+ 
+Password to use  is   changeme.
+ 
+That is simply to see if the changeme password works.
+ 
+Power down the system using the front panel
+ 
+Unplug the system's power cord(s)
+ 
+Remove the PJ6801 jumper. You must remove the PJ6801 jumper
+after resetting the password, or the password will be reset
+every time the SP is reset (e.g. at power up).
+ 
+Replace the system's top cover.
+ 
+Plug in the system's power cord(s).
+ 
+If the system administrator would like the SP's root account
+password changed to something other than  changeme  Then you
+can change the root password using the usualSP's  root account's
+Command Line User Interface command. Whether or not the SP's root
+account password is to be changed to something different than changeme
+after the top cover has been reinstalled and the system's power cord(s)
+plugged-in, if the system administrator would like the Host powered-up,
+that can be done using the front panel power button or via a login to
+the SP's root or admin accounts and the appropriate START or
+power on, respectively, may be used.
+Sun Common Array Manager Software (CAMS)
+----------------------------------------
+svn://system/fmservice:default
+/opt/SUNWsefms/sbin/fmservice.sh
+start | stop | restart | status
+Categorize Manpages: catman -w
+cfgadm List all device names on a system
+devfsadm - manages /dev and path-to-inst database
+===================
+SUNRAY
+===================
+SUNRAY command: /opt/SUNWut
+Sun Ray commands location: /opt/SUNWut/sbin
+
+Restart Sun Ray services without clearing sessions: # utrestart
+Restart Sun Ray services and CLEAR sessions: # utrestart -c
+
+SUNRAY won’t connect:
+1. Is it getting an IP address?
+- Make sure DHCP is running.  Thin clients aren’t usually configured manually.
+2. Launch SunRay Administration GUI
+- Launch browser
+- Use <sunray server>:1660
+3. Restart Sunray Service
+# /etc/init.d/utsvc stop; /etc/init.d/utsvc start
+
+XHOST: /usr/openwin/bin/xhost
+XINERAMA – X Windows feature used to move windows across screen boundaries
+- Enable xinerama: add +xinerama to the Xsun command line in /etc/dt/config/Xservers
+- The Xserver cannot be started on display :0
+- Error log: /var/dt/Xerrors
+XSUN – Solaris X11 server.  It is started by dtlogin.
+
+Display Information (framebuffer)
+Sun XVR-1200: /dev/fbs/jfb0
+Sun XVR-600: /dev/fbs/jfb0
+Sun XVR-300: /dev/fbs/nfb
+
+===================
+CDE
+===================
+CDE - Common Desktop Environment
+  /usr/dt/bin/sdtprocess
+
+Restart CDE from the command line
+As the user, verfiy dtwm as down
+ps -ef | grep dtwm
+Now start: /usr/dt/bin/dtwm &
+
+CDE Errors log: /var/dt/Xerrors and ~/.dt/errorlog
+
+CDE/Openwin: Reset terminal size for vi
+% set TERM vt100
+% /usr/openwin/bin/resize
+LINE=12
+Change a Sun Workstation's Resolution
+1. View the current configuration
+% fbconfig -prconf
+2. Find the fb device to change
+% ls -la /dev/fb*
+3. Change resolution
+% fbconfig -dev /dev/<fb #> -res <resolution> -defdepth 24
+
+Forward Solaris Graphical Programs to another machine
+% xhost +
+% echo $DISPLAY # Note the hostname:port result
+% ssh –X userid@hostname
+% setenv DISPLAY <hostname:port>   # from original machine
+
+=======================
+Kill a frozen CDE login
+=======================
+pkill -9 Xsun
+

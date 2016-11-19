@@ -1,0 +1,36 @@
+================================
+Solaris Zones (Linux Containers)
+================================
+- Solaris Zones use the "Global Zone's" operating system as the host for a spearate "jailed" set of processes
+
+Zones file: /etc/zones
+Zone States: undefined, configured, installed
+
+Zone Admin Tool: zoneadm
+zoneadm options: halt; shutdown; reboot; ready
+
+List Zones
+----------
+zoneadm list -cv
+
+Connect to a Zone
+-----------------
+As root: zlogin <zone_name>
+
+Reboot a Zone
+-------------
+1. Log into the global zone.
+2. Become root
+3. List the system's zones
+   # zoneadm list -cv
+4. Reboot selected zone
+   # zoneadm -z <zone> reboot
+5. Verify the zone is back up
+   # zoneadm list -v
+
+If a zone is outside of its global and isn't pingable after a reboot, if the server is running NIS+ try invalidating the NIS+ cache
+on the global zone host and and try rebooting again.
+    # ps -ef | grep cache
+    # kill <cache PID>
+    # zoneadm -z <zone> boot
+

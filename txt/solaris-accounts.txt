@@ -1,0 +1,60 @@
+Solaris Accounts
+
+Account default settings file: /etc/login.defs
+Default user shell init files: /etc/skel
+
+********************
+Local Accounts:
+********************
+Create a new group: # groupadd –g <gid> <groupname>
+Delete a group: # groupdel <groupname>
+Modify a group definition: # groupmod –g <gid> <groupname>
+
+To create a new account, you will need a username and a UID.  If a UID isn’t available, the system will assign the next available UID.
+Create a user account:
+# /usrsbin/useradd –d <path-to-home-directory>/userid –m –s /bin/<shell> -c “User’s Full Name” <userid>
+Note: -d may be omitted if you are using the system default “home” directory path
+          -m makes the home directory and copies the default init files from /etc/skel
+
+Assign a default password:
+# passwd <userid>
+
+Change ownership of a home directory:
+# chown –R <userid>:<primary_group> <directory_name>
+
+Change the UID (note: user cannot be logged in)
+# usermod –u <newuid> <olduid>
+
+Change user’s shell:
+# passwd -e
+
+Delete a user account:
+# /usr/sbin/userdel –r <userid>
+
+Change userid and home directory:
+# usermod –d <path_to_home_directory> -m –l <new_userid> <old_userid>
+
+********************
+NIS+ Accounts:
+********************
+NIS+ Tables that need to be updated for accounts:
+1. shadow; 2. passwd; 3. cred; 4. scoscntl
+
+NIS+ Required Processes:
+/usr/sbin/rpc.nisd
+/usr/sbin/nis_cachemgr
+/usr/sbin/rpc.nispasswdd
+
+Change User’s Shell
+-----------------------
+# nispasswd –s <userid>
+Prompt: New Shell: <type_in_full_path_and_shell_executable>
+i.e. /bin/bash
+
+Change a user’s DES Key
+-----------------------------
+chkey –p  note: requires user’s original or “old” password
+Note: If a user receives the error: “The Secure RPC credential information for <userid> will not be changed” or “Secure RPC key will not decrypt secret.”  Fix using the “chkey –p” tool to re-encrypt the DES credentials.
+
+Display password history file objects: % niscat –o passhist
+

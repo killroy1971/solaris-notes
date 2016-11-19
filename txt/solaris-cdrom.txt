@@ -1,0 +1,31 @@
+===================
+Mount CD-ROM
+===================
+Manually mount a cdrom
+-----------------------------
+1. Identify the cdrom device
+% ls -la /dev/s4r* | awk {'print "/" $11'}
+-OR-
+iostat -En
+2. Create the /cdrom directory if it doesn't exist
+% mkdir /cdrom; chmod a+rwx /cdrom
+3. Mount the cdrom
+% mount -Fhsfs -r /dev/sr0 /cdrom
+-OR-
+mount -F hsfs -o ro /dev/dsk/c1t0d0s0 /cdrom
+4. See if the cd is mounted
+df
+
+Volume Daemon: vold – mounts CD drives
+------------------------------------------------
+/usr/sbin/vold
+Restart vold daemon: pkill vold && /usr/sbin/vold &
+In Solaris 10, it is called ‘volfs’
+In Solaris 9, the follow daemons must be running in order for the automount to work:
+/usr/sbin/rpcbind
+/usr/sbin/inetd
+/usr/sbin/vold
+and the following entry must exist in /etc/inet/inetd.conf
+100155/1       tli     rpc/ticotsord   wait    root    /usr/lib/smedia/rpc.smserverd rpc.smserverd
+The vold log file is: /var/adm/vold.log
+

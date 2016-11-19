@@ -1,0 +1,30 @@
+=========
+Networking
+=========
+Gigabit Interface Converter: gbic
+Fiber does not auto-negotiate.  Copper does.
+Use a media converter if you need auto-negotiation from fiber.
+
+Display a host's IP address:
+----------------------------
+% cat /etc/host
+-OR-
+% ypcat hosts | grep -i nodename (NIS/NIS+)
+-OR-
+ipconfig -a
+
+Plumb interfaces on the global zone
+-----------------------------------------
+1. Identify the physical interface you wish to plumb: ifconfig -a4 -or- -a6
+2. Add the virtual interface: ifconfig <physical>:<virtual #> inet4 -or- inte6 plumb
+3. Assign virtual interface to zone: ifconfig <physical>:<virtual> zone <zone_name>
+4. Activate interface: ifconfig <physical>:<virtual> <ip_address> up
+5. Verify the virtual interface: ifconfig <physical>:<virtual> inet4 -or- inet6 
+    The global zone will show which zones are assigned to the interface
+
+    Un-plumb virtual interfaces
+    -------------------------------
+    1. Identify the virtual interface: ifconfig -a4 -or- -a6
+    2. Down the interface: ifconfig <physical>:<virtual> inet4 -or- inte6 down  (Note: This may not work, don’t worry)
+    3. Unplumb the virtual interface: ifconfig <physical>:<virtual> inet4 -or- inte6 unplumbp
+

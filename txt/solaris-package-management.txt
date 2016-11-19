@@ -1,0 +1,23 @@
+=================
+Package Management
+=================
+List packages: pkginfo
+Package Install: pkgadd -d </path-to-package>
+Package Remove: pkgrm <pkg_name>
+
+Scripted Package Removal
+--------------------------------
+Create a file: noise with this content:
+mail=
+instance=overwrite
+parital=nocheck
+runlevel-quit
+idepend=nocheck
+rdepend=nocheck
+space=quit
+setuid=nocheck
+conflict=nocheck
+action=nocheck
+basedir=default
+
+Use this sequence in your script: pkgrm -n -a noask <pkg_name>

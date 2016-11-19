@@ -1,0 +1,12 @@
+=======
+AUTOFS
+=======
+CYCLE AUTOFS
+-------------------
+ SOLARIS 9:    /etc/init.d/autofs stop; /etc/init.d/autofs start
+ SOLARIS 10:  svcadm restart svc:/system/filesystem/autofs:default
+
+AUTOFS Files
+----------------
+/etc/auto_master -- autofs master map.  Contains share locations and their corresponding map file
+/etc/auto_<name> -- map file for a specific shared directory.  Each share needs its own map file
