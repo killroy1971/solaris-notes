@@ -17,4 +17,4 @@
 
 ----
 
-I've included straight ASCII txt and pdf version of all files so its easy to import into whatever documentation system is in use.
+I've included straight ASCII txt and pdf versions of all files so its easy to import into whatever documentation system is in use.
